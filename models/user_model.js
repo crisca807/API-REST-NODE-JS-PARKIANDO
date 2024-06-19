@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 
-const usuarioSchema = new mongoose.Schema({
-    nombre: {
+const userSchema = new mongoose.Schema({
+    name: {
         type: String,
         required: true
     },
-    apellido: {
+    lastName: {
         type: String,
         required: true
     },
@@ -17,9 +17,9 @@ const usuarioSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    tipoUsuario: {
+    userType: {
         type: String,
-        enum: ['administrador', 'cliente'],
+        enum: ['admin', 'client'],
         required: true
     },
     estado: {
@@ -31,6 +31,6 @@ const usuarioSchema = new mongoose.Schema({
     }
 });
 
-const Usuario = mongoose.model('Usuario', usuarioSchema);
+const User = mongoose.model('Usuarios', userSchema);
 
-module.exports = Usuario;
+module.exports = User;

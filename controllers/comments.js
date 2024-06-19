@@ -1,29 +1,28 @@
-
 const express = require('express');
 const router = express.Router();
-const logic = require('../logic/comentario_logic');
+const commentLogic = require('../logic/comment_logic');
 
-// Endpoint de tipo GET para listar todos los comentarios
+// GET endpoint to list all comments
 router.get('/', (req, res) => {
-    logic.listarComentarios()
-        .then(comentarios => {
-            res.json(comentarios);
+    commentLogic.listComments()
+        .then(comments => {
+            res.json(comments);
         })
         .catch(err => {
             res.status(400).json({ error: err.message });
         });
 });
 
-// Endpoint de tipo POST para crear un nuevo comentario
+// POST endpoint to create a new comment
 router.post('/', (req, res) => {
     const body = req.body;
 
-    const { error, value } = logic.Schema.validate(body);
+    const { error, value } = commentLogic.Schema.validate(body);
 
     if (!error) {
-        logic.crearComentario(body)
-            .then(comentario => {
-                res.json({ comentario });
+        commentLogic.createComment(body)
+            .then(comment => {
+                res.json({ comment });
             })
             .catch(err => {
                 res.status(400).json({ error: err.message });
@@ -33,14 +32,14 @@ router.post('/', (req, res) => {
     }
 });
 
-// Endpoint de tipo PUT para actualizar los datos de un comentario
+// PUT endpoint to update a comment by its ID
 router.put('/:id', (req, res) => {
-    const { error, value } = logic.Schema.validate(req.body);
+    const { error, value } = commentLogic.Schema.validate(req.body);
 
     if (!error) {
-        logic.actualizarComentario(req.params.id, req.body)
-            .then(comentario => {
-                res.json({ comentario });
+        commentLogic.updateComment(req.params.id, req.body)
+            .then(comment => {
+                res.json({ comment });
             })
             .catch(err => {
                 res.status(400).json({ error: err.message });
@@ -49,12 +48,12 @@ router.put('/:id', (req, res) => {
         res.status(400).json({ error });
     }
 });
-  
-// Endpoint de tipo DELETE para eliminar un comentario
+
+// DELETE endpoint to delete a comment by its ID
 router.delete('/:id', (req, res) => {
-    logic.eliminarComentario(req.params.id)
+    commentLogic.deleteComment(req.params.id)
         .then(() => {
-            res.json({ mensaje: "Comentario eliminado correctamente" });
+            res.json({ message: "Comment deleted successfully" });
         })
         .catch(err => {
             res.status(400).json({ error: err.message });

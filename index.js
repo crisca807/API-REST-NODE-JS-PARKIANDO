@@ -3,16 +3,16 @@ const mongoose = require('mongoose');
 
 
 
-const usuarios = require('./controllers/usuarios');
-const reservas = require('./controllers/reservas');
-const establecimientos = require('./controllers/establecimientos');
-const comentarios = require('./controllers/comentarios');
-const calificaciones = require('./controllers/calificaciones');
+const users = require('./controllers/User');
+const reservations = require('./controllers/reservations');
+const establishments = require('./controllers/establishments');
+const comments = require('./controllers/comments');
+const qualifications = require('./controllers/qualifications');
 
 const app = express();
 
 // Middleware para conectar a la base de datos MongoDB
-mongoose.connect('mongodb+srv://crisca807:solomillos@cluster0.rqfwsbc.mongodb.net/')
+mongoose.connect('mongodb+srv://crisca807:PARKIANDO@apiparkiandorest1.uzojh3u.mongodb.net/')
     .then(() => console.log('Conectado a MongoDB...'))
     .catch(err => console.log('No se pudo conectar con MongoDB...', err));
 
@@ -23,12 +23,12 @@ app.use(express.urlencoded({ extended: true }));
 // Middleware para servir la documentación de Swagger
 
 
-// Endpoints (recursos)
-app.use('/api/usuarios', usuarios);
-app.use('/api/reservas', reservas);
-app.use('/api/establecimientos', establecimientos);
-app.use('/api/comentarios', comentarios);
-app.use('/api/calificaciones', calificaciones);
+// Endpoints de la API
+app.use('/api/user', users);
+app.use('/api/reservations', reservations);
+app.use('/api/establishments', establishments);
+app.use('/api/comments', comments);
+app.use('/api/qualifications', qualifications);
 
 const cors = require('cors'); 
 

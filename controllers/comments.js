@@ -2,14 +2,14 @@ const express = require('express');
 const router = express.Router();
 const commentLogic = require('../logic/comment_logic');
 
-// GET endpoint to list all comments
+// GET endpoint para listar todos los comentarios
 router.get('/', (req, res) => {
     commentLogic.listComments()
         .then(comments => {
             res.json(comments);
         })
         .catch(err => {
-            res.status(400).json({ error: err.message });
+            res.status(500).json({ error: err.message });
         });
 });
 
@@ -19,44 +19,52 @@ router.post('/', (req, res) => {
 
     const { error, value } = commentLogic.Schema.validate(body);
 
-    if (!error) {
-        commentLogic.createComment(body)
-            .then(comment => {
-                res.json({ comment });
-            })
-            .catch(err => {
-                res.status(400).json({ error: err.message });
-            });
-    } else {
-        res.status(400).json({ error });
+    if (error) {
+        return res.status(400).json({ error: error.details[0].message });
     }
+
+    commentLogic.createComment(body)
+        .then(comment => {
+            res.status(201).json({ comment });
+        })
+        .catch(err => {
+            res.status(500).json({ error: err.message });
+        });
 });
 
-// PUT endpoint to update a comment by its ID
+// PUT endpoint para actualizar un comentario por su ID
 router.put('/:id', (req, res) => {
-    const { error, value } = commentLogic.Schema.validate(req.body);
+    const { error, value } = commentLogic.commentSchema.validate(req.body); // Asegúrate de utilizar commentSchema aquí
 
     if (!error) {
         commentLogic.updateComment(req.params.id, req.body)
             .then(comment => {
-                res.json({ comment });
+                if (comment) {
+                    res.json({ comment });
+                } else {
+                    res.status(404).json({ error: 'Comment not found' });
+                }
             })
             .catch(err => {
-                res.status(400).json({ error: err.message });
+                res.status(500).json({ error: err.message });
             });
     } else {
-        res.status(400).json({ error });
+        res.status(400).json({ error: error.details[0].message });
     }
 });
 
-// DELETE endpoint to delete a comment by its ID
+// DELETE endpoint para eliminar un comentario por su ID
 router.delete('/:id', (req, res) => {
     commentLogic.deleteComment(req.params.id)
-        .then(() => {
-            res.json({ message: "Comment deleted successfully" });
+        .then(result => {
+            if (result.deletedCount > 0) {
+                res.json({ message: "Comment deleted successfully" });
+            } else {
+                res.status(404).json({ error: 'Comment not found' });
+            }
         })
         .catch(err => {
-            res.status(400).json({ error: err.message });
+            res.status(500).json({ error: err.message });
         });
 });
 

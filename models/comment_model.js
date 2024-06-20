@@ -2,7 +2,17 @@ const mongoose = require('mongoose');
 
 // Define schema for Comment model
 const commentSchema = new mongoose.Schema({
-    text: {
+    parking: {
+        type: String,
+        required: true
+    },
+    valoration: {
+        type: Number,
+        required: true,
+        min: 1,
+        max: 5
+    },
+    comment: {
         type: String,
         required: true
     }

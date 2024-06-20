@@ -10,10 +10,16 @@ const qualifications = require('./controllers/qualifications');
 
 const app = express();
 
+
 // Middleware para conectar a la base de datos MongoDB
-mongoose.connect('mongodb+srv://crisca807:PARKIANDO@apiparkiandorest1.uzojh3u.mongodb.net/')
-    .then(() => console.log('Conectado a MongoDB...'))
-    .catch(err => console.log('No se pudo conectar con MongoDB...', err));
+mongoose.connect('mongodb+srv://crisca807:PARKIANDO@apiparkiandorest1.uzojh3u.mongodb.net/', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(() => {
+    console.log('Conectado a MongoDB...');
+}).catch(err => {
+    console.error('No se pudo conectar con MongoDB:', err);
+});
 
 // Middleware para el manejo de solicitudes JSON
 app.use(express.json());
@@ -21,9 +27,10 @@ app.use(express.urlencoded({ extended: true }));
 
 // Middleware CORS para permitir peticiones desde localhost:3000
 app.use(cors({
-  origin: 'http://localhost:3000',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true  // Permite incluir cookies y credenciales de autenticación
 }));
 
 // Endpoint /ping para verificar la conexión con el frontend

@@ -3,8 +3,9 @@ const Joi = require('@hapi/joi');
 
 // Validation schema for Comment object
 const Schema = Joi.object({
-    text: Joi.string()
-        .required()
+    parking: Joi.string().required(),
+    valoration: Joi.number().required(),
+    comment: Joi.string().required(),
 });
 
 // Asynchronous function to create a comment

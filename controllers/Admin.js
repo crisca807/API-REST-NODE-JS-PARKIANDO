@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const logic = require('../logic/user_logic');
+const logic = require('../logic/Admin_logic');
 
 // Endpoint para verificar si un usuario existe
 router.post('/check-account', async (req, res) => {

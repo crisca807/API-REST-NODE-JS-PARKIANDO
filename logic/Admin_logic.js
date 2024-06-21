@@ -1,4 +1,4 @@
-const User = require('../models/user_model');
+const User = require('../models/Admin_model');
 const Joi = require('@hapi/joi');
 const bcrypt = require('bcrypt');
 
@@ -20,6 +20,11 @@ const Schema = Joi.object({
 
     password: Joi.string()
         .pattern(/^[a-zA-Z0-9]{3,30}$/)
+        .required(),
+
+    address: Joi.string()
+        .min(3)
+        .max(30)
         .required(),
 
     userType: Joi.string()
@@ -78,6 +83,9 @@ async function updateUser(email, data) {
         }
         if (data.email) {
             user.email = data.email;
+        }
+        if (data.address) {
+            user.address = data.address;
         }
 
         return await user.save();

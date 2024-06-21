@@ -6,7 +6,7 @@ const users = require('./controllers/user');
 const reservations = require('./controllers/reservations');
 const establishments = require('./controllers/establishments');
 const comments = require('./controllers/comments');
-const qualifications = require('./controllers/qualifications');
+const Admin = require('./controllers/Admin');
 
 const app = express();
 
@@ -43,7 +43,7 @@ app.use('/api/user', users);
 app.use('/api/reservations', reservations);
 app.use('/api/establishments', establishments);
 app.use('/api/comments', comments);
-app.use('/api/qualifications', qualifications);
+app.use('/api/Admin', Admin);
 
 // Puerto de escucha
 const port = process.env.PORT || 3004;

@@ -19,7 +19,7 @@ router.post('/auth', async (req, res) => {
         const { email, password } = req.body;
         const token = await logic.authenticateUser(email, password);
         if (token) {
-            res.json({ message: 'success', token: token });
+            res.json({ message: 'success', token });
         } else {
             res.status(401).json({ message: 'failed', error: 'Correo electrónico o contraseña inválidos' });
         }
@@ -47,8 +47,8 @@ router.post('/', async (req, res) => {
         const { error } = logic.Schema.validate({
             name: nombre,
             lastName: apellido,
-            email: email,
-            password: password,
+            email,
+            password,
             userType: tipoUsuario
         });
 
@@ -59,8 +59,8 @@ router.post('/', async (req, res) => {
         const user = await logic.createUser({
             name: nombre,
             lastName: apellido,
-            email: email,
-            password: password,
+            email,
+            password,
             userType: tipoUsuario
         });
         res.json({ user });
@@ -92,6 +92,27 @@ router.delete('/:email', async (req, res) => {
         res.json({ user: result });
     } catch (error) {
         res.status(400).json({ error: error.message });
+    }
+});
+
+// POST endpoint para restablecer la contraseña
+router.post('/reset-password', async (req, res) => {
+    const { email, newPassword } = req.body;
+
+    try {
+        // Verificar si el usuario existe
+        const userExists = await logic.checkUserExists(email);
+        if (!userExists) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+
+        // Actualizar la contraseña del usuario
+        await logic.resetUserPassword(email, newPassword);
+
+        res.status(200).json({ message: 'Contraseña restablecida exitosamente' });
+    } catch (error) {
+        console.error('Error al restablecer la contraseña:', error);
+        res.status(400).json({ error: 'No se pudo restablecer la contraseña' });
     }
 });
 

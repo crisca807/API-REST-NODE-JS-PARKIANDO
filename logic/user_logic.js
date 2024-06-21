@@ -111,6 +111,28 @@ async function authenticateUser(email, password) {
     }
 }
 
+// Async function to reset user password
+async function resetUserPassword(email, newPassword) {
+    try {
+        // Verificar si el usuario existe
+        const user = await User.findOne({ email });
+        if (!user) {
+            throw new Error('Usuario no encontrado');
+        }
+
+        // Encriptar la nueva contraseña
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        
+        // Actualizar la contraseña del usuario
+        user.password = hashedPassword;
+        await user.save();
+
+        return true; // Indicar que la contraseña se ha restablecido correctamente
+    } catch (error) {
+        throw new Error('Error restableciendo contraseña del usuario: ' + error.message);
+    }
+}
+
 module.exports = {
     Schema,
     createUser,
@@ -118,5 +140,6 @@ module.exports = {
     deactivateUser,
     listActiveUsers,
     checkUserExists,
-    authenticateUser
+    authenticateUser,
+    resetUserPassword
 };

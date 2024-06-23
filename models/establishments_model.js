@@ -1,3 +1,4 @@
+// models/establishments_model.js
 const mongoose = require('mongoose');
 
 const establishmentSchema = new mongoose.Schema({
@@ -5,14 +6,26 @@ const establishmentSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    Owner: {
+        type: String,
+        required: true
+    },
+    Address: {
+        type: String,
+        required: true
+    },
     Capacity: {
         type: Number,
         required: true
     },
-    Price: {
-        type: String,
+    MotoPrice: {
+        type: Number,
         required: true
     },
+    CarPrice: {
+        type: Number,
+        required: true
+    }
 });
 
 const Establishment = mongoose.model('Establishment', establishmentSchema);

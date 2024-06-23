@@ -1,11 +1,15 @@
+// logic/establishments_logic.js
 const Establishment = require('../models/establishments_model');
 const Joi = require('@hapi/joi');
 
 // Schema validation for Establishment object
 const Schema = Joi.object({
     EstablishmentName: Joi.string().required(),
+    Owner: Joi.string().required(),
+    Address: Joi.string().required(),
     Capacity: Joi.number().integer().required(),
-    Price: Joi.string().required() // Validación actualizada para aceptar un String
+    MotoPrice: Joi.number().required(),
+    CarPrice: Joi.number().required()
 });
 
 // Asynchronous function to create an establishment
@@ -19,24 +23,23 @@ async function createEstablishment(body) {
     }
 }
 
-// Función asincrónica para desactivar un establecimiento por su ID
+// Asynchronous function to deactivate an establishment by its ID
 async function deactivateEstablishment(id) {
     try {
         return await Establishment.findByIdAndUpdate(id, { isActive: false }, { new: true });
     } catch (error) {
-        throw new Error("Error desactivando establecimiento: " + error.message);
+        throw new Error("Error deactivating establishment: " + error.message);
     }
 }
 
-// Otra función asincrónica para eliminar un establecimiento por su ID
+// Asynchronous function to delete an establishment by its ID
 async function deleteEstablishment(id) {
     try {
         return await Establishment.findByIdAndDelete(id);
     } catch (error) {
-        throw new Error("Error eliminando establecimiento: " + error.message);
+        throw new Error("Error deleting establishment: " + error.message);
     }
 }
-
 
 // Asynchronous function to list all establishments
 async function listEstablishments() {

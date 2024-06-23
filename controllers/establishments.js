@@ -1,3 +1,4 @@
+// routes/establishments.js
 const express = require('express');
 const router = express.Router();
 const establishmentLogic = require('../logic/establishments_logic');
@@ -76,7 +77,7 @@ router.delete('/:id', (req, res) => {
             if (deletedEstablishment) {
                 res.json({ establishment: deletedEstablishment });
             } else {
-                res.status(404).json({ error: "Establecimiento no encontrado" });
+                res.status(404).json({ error: "Establishment not found" });
             }
         })
         .catch(err => {

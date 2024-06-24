@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const logic = require('../logic/user_logic');
+
 // Endpoint para verificar si un usuario existe
 router.post('/check-account', async (req, res) => {
     try {
@@ -11,21 +12,25 @@ router.post('/check-account', async (req, res) => {
         res.status(400).json({ error: error.message });
     }
 });
+
 // Endpoint para autenticar un usuario
 router.post('/auth', async (req, res) => {
     try {
         const { email, password } = req.body;
-        const token = await logic.authenticateUser(email, password);
-        if (token) {
-            res.json({ message: 'success', token: token });
-            res.json({ message: 'success', token });
-        } else {
-            res.status(401).json({ message: 'failed', error: 'Correo electrónico o contraseña inválidos' });
+        const { userType, token, error } = await logic.authenticateUser(email, password);
+
+        if (error) {
+            return res.status(401).json({ message: 'failed', error });
         }
+
+        // Si la autenticación es exitosa, envía el token y el tipo de usuario
+        res.json({ message: 'success', token, userType });
     } catch (error) {
-        res.status(401).json({ message: 'failed', error: error.message });
+        console.error('Error al autenticar usuario:', error);
+        res.status(500).json({ message: 'failed', error: 'Error al autenticar usuario. Por favor, inténtalo de nuevo más tarde.' });
     }
 });
+
 // GET endpoint para obtener todos los usuarios activos
 router.get('/', async (req, res) => {
     try {
@@ -35,38 +40,33 @@ router.get('/', async (req, res) => {
         res.status(400).json({ error: error.message });
     }
 });
+
 // POST endpoint para crear un nuevo usuario
 router.post('/', async (req, res) => {
     try {
         const { nombre, apellido, email, password, tipoUsuario } = req.body;
-        // Validación de los datos del usuario
-        const { error } = logic.Schema.validate({
-            name: nombre,
-            lastName: apellido,
-            email: email,
-            password: password,
-            email,
-            password,
-            userType: tipoUsuario
-        });
 
-        if (error) {
-            return res.status(400).json({ error: error.details });
+        // Verificar si el correo electrónico ya está registrado
+        const emailExists = await logic.checkUserExists(email);
+        if (emailExists) {
+            return res.status(400).json({ error: 'Este correo electrónico ya está registrado' });
         }
+
+        // Crear el usuario utilizando la función actualizada
         const user = await logic.createUser({
             name: nombre,
             lastName: apellido,
             email: email,
             password: password,
-            email,
-            password,
             userType: tipoUsuario
         });
+
         res.json({ user });
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
 });
+
 // PUT endpoint para actualizar los datos de un usuario
 router.put('/:email', async (req, res) => {
     try {
@@ -81,6 +81,7 @@ router.put('/:email', async (req, res) => {
         res.status(400).json({ error: error.message });
     }
 });
+
 // DELETE endpoint para desactivar un usuario
 router.delete('/:email', async (req, res) => {
     try {

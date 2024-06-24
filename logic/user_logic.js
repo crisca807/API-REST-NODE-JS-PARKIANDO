@@ -1,6 +1,8 @@
 const User = require('../models/user_model');
 const Joi = require('@hapi/joi');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
 // Validation schema for user object
 const Schema = Joi.object({
     name: Joi.string()
@@ -21,18 +23,31 @@ const Schema = Joi.object({
         .valid('admin', 'client') // Permitir solo 'admin' y 'client'
         .required()
 });
+
 // Async function to create a user
 async function createUser(body) {
     try {
+        // Verificar si el correo electrónico ya está registrado
+        const emailExists = await checkUserExists(body.email);
+        if (emailExists) {
+            throw new Error('Este correo electrónico ya está registrado');
+        }
+
+        // Validar los datos del usuario según el esquema
         const value = await Schema.validateAsync(body);
-        const hashedPassword = await bcrypt.hash(value.password, 10); // Encripta la contraseña
+
+        // Encriptar la contraseña antes de guardarla
+        const hashedPassword = await bcrypt.hash(value.password, 10);
         value.password = hashedPassword;
+
+        // Crear un nuevo usuario con los datos validados y encriptados
         const user = new User(value);
         return await user.save();
     } catch (error) {
         throw new Error("Error creating user: " + error.message);
     }
 }
+
 // Async function to deactivate a user
 async function deactivateUser(email) {
     try {
@@ -41,6 +56,7 @@ async function deactivateUser(email) {
         throw new Error("Error deactivating user: " + error.message);
     }
 }
+
 // Async function to list all active users
 async function listActiveUsers() {
     try {
@@ -49,6 +65,7 @@ async function listActiveUsers() {
         throw new Error("Error listing active users: " + error.message);
     }
 }
+
 // Async function to update user data
 async function updateUser(email, data) {
     try {
@@ -73,6 +90,7 @@ async function updateUser(email, data) {
         throw new Error("Error updating user: " + error.message);
     }
 }
+
 // Async function to check if a user exists
 async function checkUserExists(email) {
     try {
@@ -82,17 +100,29 @@ async function checkUserExists(email) {
         throw new Error("Error checking user: " + error.message);
     }
 }
+
 // Async function to authenticate a user
 async function authenticateUser(email, password) {
     try {
         const user = await User.findOne({ email });
-        if (user && await bcrypt.compare(password, user.password)) {
-            return "generated_authentication_token"; // Placeholder, implement actual token generation
-        } else {
-            return null;
+        
+        if (!user) {
+            return { error: 'Usuario no encontrado', userType: null, token: null };
         }
+        
+        const isMatch = await bcrypt.compare(password, user.password);
+        
+        if (!isMatch) {
+            return { error: 'Contraseña incorrecta', userType: null, token: null };
+        }
+
+        // Si hay coincidencia de contraseña, generamos el token JWT
+        const token = jwt.sign({ userId: user._id }, 'tu_secreto', { expiresIn: '1h' });
+        
+        // Devolver el tipo de usuario y el token
+        return { userType: user.userType, token };
     } catch (error) {
-        throw new Error("Error authenticating user: " + error.message);
+        throw new Error("Error autenticando usuario: " + error.message);
     }
 }
 
@@ -126,5 +156,5 @@ module.exports = {
     listActiveUsers,
     checkUserExists,
     authenticateUser,
-  resetUserPassword
+    resetUserPassword
 };

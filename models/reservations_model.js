@@ -1,26 +1,33 @@
 const mongoose = require('mongoose');
 
 const reservationSchema = new mongoose.Schema({
-    ReservationTime: {
+    parkingLotId: {
+        type: Number,
+        required: true
+    },
+    startDate: {
         type: Date,
         required: true
     },
-    Plate: {
+    startTime: {
         type: String,
-        required: true,
-        maxlength: 15
-    },
-    VehicleType: {
-        type: String,
-        enum: ['motorcycle', 'car'],
         required: true
     },
-    Duration: {
-        type: Number, // Duration in minutes
+    duration: {
+        type: Number,
         required: true
     },
-    TotalPrice: {
-        type: Number, // Total price in Colombian Pesos
+    totalPrice: {
+        type: Number,
+        required: true
+    },
+    plate: {
+        type: String,
+        required: true
+    },
+    vehicleType: {
+        type: String,
+        enum: ['car', 'motorcycle'],
         required: true
     }
 });

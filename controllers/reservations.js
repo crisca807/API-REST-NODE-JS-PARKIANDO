@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const reservationLogic = require('../logic/reservations_logic');
 
-// GET endpoint to list all reservations
 router.get('/', (req, res) => {
     reservationLogic.listReservations()
         .then(reservations => {
@@ -13,26 +12,17 @@ router.get('/', (req, res) => {
         });
 });
 
-// POST endpoint to create a new reservation
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
     const body = req.body;
 
-    const { error, value } = reservationLogic.Schema.validate(body);
-
-    if (!error) {
-        reservationLogic.createReservation(body)
-            .then(reservation => {
-                res.json({ value: reservation });
-            })
-            .catch(err => {
-                res.status(400).json({ error: err.message });
-            });
-    } else {
-        res.status(400).json({ error });
+    try {
+        const reservation = await reservationLogic.createReservation(body);
+        res.json({ reservation });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
     }
 });
 
-// PUT endpoint to update reservation data by ID
 router.put('/:id', (req, res) => {
     const { error, value } = reservationLogic.Schema.validate(req.body);
 
@@ -49,7 +39,6 @@ router.put('/:id', (req, res) => {
     }
 });
 
-// DELETE endpoint to delete a reservation by ID
 router.delete('/:id', (req, res) => {
     reservationLogic.deleteReservation(req.params.id)
         .then(value => {
@@ -60,7 +49,6 @@ router.delete('/:id', (req, res) => {
         });
 });
 
-// GET endpoint to search for a reservation by plate
 router.get('/search', (req, res) => {
     const plate = req.query.plate;
 

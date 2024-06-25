@@ -2,6 +2,16 @@ const express = require('express');
 const router = express.Router();
 const reservationLogic = require('../logic/reservations_logic');
 
+// Middleware to check if the user is an admin
+function isAdmin(req, res, next) {
+    const userType = req.user && req.user.userType;
+    if (userType === 'admin') {
+        next();
+    } else {
+        res.status(403).json({ error: 'Access denied' });
+    }
+}
+
 router.get('/', (req, res) => {
     reservationLogic.listReservations()
         .then(reservations => {
@@ -23,7 +33,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', isAdmin, (req, res) => {
     const { error, value } = reservationLogic.Schema.validate(req.body);
 
     if (!error) {
@@ -39,7 +49,7 @@ router.put('/:id', (req, res) => {
     }
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', isAdmin, (req, res) => {
     reservationLogic.deleteReservation(req.params.id)
         .then(value => {
             res.json({ reservation: value });

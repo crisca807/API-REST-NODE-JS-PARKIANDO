@@ -29,6 +29,12 @@ const reservationSchema = new mongoose.Schema({
         type: String,
         enum: ['car', 'motorcycle'],
         required: true
+    },
+    status: {
+        type: String,
+        enum: ['pending', 'active', 'inactive'],
+        default: 'pending',
+        required: true
     }
 });
 

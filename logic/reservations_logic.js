@@ -14,7 +14,8 @@ const Schema = Joi.object({
     duration: Joi.number().integer().min(1).required(),
     totalPrice: Joi.number().required(),
     plate: Joi.string().required(),
-    vehicleType: Joi.string().valid('car', 'motorcycle').required() // Ajustado para que coincida con los valores esperados
+    vehicleType: Joi.string().valid('car', 'motorcycle').required(),
+    status: Joi.string().valid('pending', 'active', 'inactive').optional() // Allow status field but not required
 });
 
 
@@ -33,6 +34,7 @@ async function createReservation(body) {
         }
 
         value.totalPrice = calculateTotalPrice(value.vehicleType, value.duration, parqueadero);
+        value.status = 'pending'; // Set status to pending by default
 
         const reservation = new Reservation(value);
         return await reservation.save();
@@ -71,6 +73,7 @@ async function updateReservation(id, data) {
             reservation.Duration = data.Duration;
             reservation.TotalPrice = calculateTotalPrice(reservation.VehicleType, data.Duration);
         }
+        if (data.status) reservation.status = data.status; // Allow status update
 
         return await reservation.save();
     } catch (error) {

@@ -1,72 +1,49 @@
-const assert = require('assert');
+const express = require('express');
 const mongoose = require('mongoose');
-const { createUser, authenticateUser } = require('../../controllers/user');
-const { createReservation, listReservations } = require('../../controllers/reservations');
-const User = require('../../models/user_model');
+const cors = require('cors');
 
-describe('Integration Tests', function () {
-    // Conectar a la base de datos antes de las pruebas
-    beforeAll(async () => {
-        await mongoose.connect('mongodb://localhost:27017/test', {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
-    });
+const usersRouter = require('./controllers/user');
+const reservationsRouter = require('./controllers/reservations');
+const establishmentsRouter = require('./controllers/establishments');
+const commentsRouter = require('./controllers/comments');
 
-    // Desconectar la base de datos después de las pruebas
-    afterAll(async () => {
-        await mongoose.disconnect();
-    });
+const app = express();
 
-    // Limpiar colecciones después de cada prueba
-    afterEach(async () => {
-        await User.deleteMany({});
-    });
+// Middleware para conectar a la base de datos MongoDB
+mongoose.connect('mongodb+srv://crisca807:PARKIANDO@apiparkiandorest1.uzojh3u.mongodb.net/', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+}).then(() => {
+    console.log('Conectado a MongoDB...');
+}).catch(err => {
+    console.error('No se pudo conectar con MongoDB:', err);
+});
 
-    it('should create a user and make a reservation', async () => {
-        // Crear un usuario de ejemplo
-        const userData = {
-            name: 'John',
-            lastName: 'Doe',
-            email: 'john.doe@example.com',
-            password: 'password',
-            userType: 'client'
-        };
+// Middleware para el manejo de solicitudes JSON
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-        // Crear un usuario usando la función de controlador
-        const createdUser = await createUser(userData);
+// Middleware CORS para permitir peticiones desde localhost:3000
+app.use(cors({
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
 
-        // Verificar que el usuario se haya creado correctamente
-        assert.ok(createdUser._id);
+// Endpoint /ping para verificar la conexión con el frontend
+app.get('/ping', (req, res) => {
+    res.status(200).json({ message: 'Conexión establecida con el frontend' });
+});
 
-        // Autenticar al usuario para obtener el token de autenticación
-        const authResult = await authenticateUser(userData.email, userData.password);
+// Endpoints de la API
+app.use('/api/user', usersRouter);
+app.use('/api/reservations', reservationsRouter);
+app.use('/api/establishments', establishmentsRouter);
+app.use('/api/comments', commentsRouter);
 
-        // Verificar que la autenticación sea exitosa
-        assert.strictEqual(authResult.message, 'success');
-
-        // Datos de la reserva de ejemplo
-        const reservationData = {
-            parkingLotId: 1,
-            startDate: new Date(),
-            startTime: '10:00 AM',
-            duration: 120, // Duración en minutos
-            plate: 'ABC123',
-            vehicleType: 'car'
-        };
-
-        // Crear una reserva vinculada al usuario autenticado
-        const createdReservation = await createReservation(reservationData);
-
-        // Verificar que la reserva se haya creado correctamente
-        assert.ok(createdReservation._id);
-
-        // Listar todas las reservas para el usuario
-        const reservations = await listReservations();
-
-        // Verificar que la lista de reservas no esté vacía y contenga la reserva creada
-        assert.ok(reservations.length > 0);
-        const reservationExists = reservations.some(res => res._id.toString() === createdReservation._id.toString());
-        assert.strictEqual(reservationExists, true);
-    });
+// Puerto de escucha
+const port = process.env.PORT || 3004;
+app.listen(port, () => {
+    console.log('API REST en funcionamiento en el puerto:', port);
 });

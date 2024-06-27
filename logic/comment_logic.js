@@ -47,7 +47,7 @@ async function updateComment(id, data) {
 
         // Update the comment text with the new data
         if (data.text) {
-            comment.text = data.text;
+            comment.text = data.comment;
         }
 
         // Save the changes to the database

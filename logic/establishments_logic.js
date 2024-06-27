@@ -26,11 +26,13 @@ async function createEstablishment(body) {
 // Asynchronous function to deactivate an establishment by its ID
 async function deactivateEstablishment(id) {
     try {
-        return await Establishment.findByIdAndUpdate(id, { isActive: false }, { new: true });
+        const updatedEstablishment = await Establishment.findByIdAndUpdate(id, { isActive: false }, { new: true });
+        return updatedEstablishment;
     } catch (error) {
         throw new Error("Error deactivating establishment: " + error.message);
     }
 }
+
 
 // Asynchronous function to delete an establishment by its ID
 async function deleteEstablishment(id) {

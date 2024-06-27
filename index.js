@@ -25,7 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Middleware CORS para permitir peticiones desde localhost:3000
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: 'https://parkiandofrontend.onrender.com',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true

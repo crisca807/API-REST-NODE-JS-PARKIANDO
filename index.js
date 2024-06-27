@@ -1,44 +1,46 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 
-
-
-const usuarios = require('./controllers/usuarios');
-const reservas = require('./controllers/reservas');
-const establecimientos = require('./controllers/establecimientos');
-const comentarios = require('./controllers/comentarios');
-const calificaciones = require('./controllers/calificaciones');
+const usersRouter = require('./controllers/user');
+const reservationsRouter = require('./controllers/reservations');
+const establishmentsRouter = require('./controllers/establishments');
+const commentsRouter = require('./controllers/comments');
 
 const app = express();
 
 // Middleware para conectar a la base de datos MongoDB
-mongoose.connect('mongodb+srv://crisca807:solomillos@cluster0.rqfwsbc.mongodb.net/')
-    .then(() => console.log('Conectado a MongoDB...'))
-    .catch(err => console.log('No se pudo conectar con MongoDB...', err));
+mongoose.connect('mongodb+srv://crisca807:PARKIANDO@apiparkiandorest1.uzojh3u.mongodb.net/', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+}).then(() => {
+    console.log('Conectado a MongoDB...');
+}).catch(err => {
+    console.error('No se pudo conectar con MongoDB:', err);
+});
 
 // Middleware para el manejo de solicitudes JSON
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Middleware para servir la documentación de Swagger
+// Middleware CORS para permitir peticiones desde localhost:3000
+app.use(cors({
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
 
+// Endpoint /ping para verificar la conexión con el frontend
+app.get('/ping', (req, res) => {
+    res.status(200).json({ message: 'Conexión establecida con el frontend' });
+});
 
-// Endpoints (recursos)
-app.use('/api/usuarios', usuarios);
-app.use('/api/reservas', reservas);
-app.use('/api/establecimientos', establecimientos);
-app.use('/api/comentarios', comentarios);
-app.use('/api/calificaciones', calificaciones);
-
-const cors = require('cors'); 
-
-app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    next();
-  });
-  
+// Endpoints de la API
+app.use('/api/user', usersRouter);
+app.use('/api/reservations', reservationsRouter);
+app.use('/api/establishments', establishmentsRouter);
+app.use('/api/comments', commentsRouter);
 
 // Puerto de escucha
 const port = process.env.PORT || 3004;

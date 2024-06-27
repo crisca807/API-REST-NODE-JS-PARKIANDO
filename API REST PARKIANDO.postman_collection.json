@@ -1,0 +1,430 @@
+{
+	"info": {
+		"_postman_id": "9f6e420f-4949-4533-bde8-5194060d8523",
+		"name": "API REST PARKIANDO",
+		"description": "StartFragment\n\n# Description:\n\nExplore CRUD operations for backend controllers (User, Establishment, Reservations, Comments) within the Parkiando project. Each controller features verified methods for creating, reading, updating, and deleting data, ensuring seamless interaction with the backend APIs. All endpoints are structured under `http://localhost:3004/api`, providing a unified approach to managing user, establishment, reservation, and comment data via HTTP requests.\n\n# **How to use**\n\nThis collection guides you through utilizing CRUD methods for each controller. Each endpoint is designated to its respective resource under `http://localhost:3004/api`. To execute a request, simply click \"Send\" to interact with the API. For requests requiring data in the body, ensure to fill in the necessary fields as specified.\n\n- **GET:** Retrieve existing data.\n    \n- **POST:** Create new entries.\n    \n- **PUT:** Update existing entries.\n    \n- **DELETE:** Remove entries from the database.\n    \n\n# **Our**\n\nParkiando is a project designed to facilitate parking reservations within the Usme locality across various affiliated parking facilities. This initiative aims to streamline parking management and enhance user experience through efficient booking processes and reliable service.\n\nEndFragment\n\n_©Parkiando 2024_",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "36206707"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Get client",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3004/api/user",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3004",
+							"path": [
+								"api",
+								"user"
+							]
+						},
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "Post client",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"Add your name in the body\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/info",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"info"
+							]
+						},
+						"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "Update client",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful PUT request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Cristian\",\n    \"lastName\": \"Barrera\",\n    \"password\": \"123414\",\n    \"email\": \"crisca999@gmail.com\",\n    \"userType\": \"client\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3004/api/user/crisca999@gmail.com",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3004",
+							"path": [
+								"api",
+								"user",
+								"crisca999@gmail.com"
+							]
+						},
+						"description": "This is a PUT request and it is used to overwrite an existing piece of data. For instance, after you create an entity with a POST request, you may want to modify that later. You can do that using a PUT request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful PUT request typically returns a `200 OK`, `201 Created`, or `204 No Content` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete data",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful DELETE request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/info?id=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"info"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "This is a DELETE request, and it is used to delete data that was previously created via a POST request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful DELETE request typically returns a `200 OK`, `202 Accepted`, or `204 No Content` response code."
+					},
+					"response": []
+				}
+			],
+			"description": "StartFragment\n\n- **Description:** Manages user accounts, including registration, authentication, profile management, and deletion.\n    \n- **Endpoints:** Handles CRUD operations for user data such as creating new users, retrieving user information, updating user profiles, and deleting user accounts.\n    \n- **Base URL:** [http://localhost:3004/api/user](https://null)\n    \n- **Date Created:** June 20, 2024\n    \n\nEndFragment\n\n_©Parkiando 2024_"
+		},
+		{
+			"name": "Establishment",
+			"item": [
+				{
+					"name": "Get establishment",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "POST establishment",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3004/api/establishments",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3004",
+							"path": [
+								"api",
+								"establishments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT establishment",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"EstablishmentName\": \"nose\",\r\n    \"Owner\": \"YO\",\r\n    \"Address\": \"talvez\",\r\n    \"Capacity\": 500,\r\n    \"MotoPrice\": 100,\r\n    \"CarPrice\": 200\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3004/api/establishments/667cd996b5debdebeab0ac92",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3004",
+							"path": [
+								"api",
+								"establishments",
+								"667cd996b5debdebeab0ac92"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE establishment",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3004/api/establishments/667cd996b5debdebeab0ac92",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3004",
+							"path": [
+								"api",
+								"establishments",
+								"667cd996b5debdebeab0ac92"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "StartFragment\n\n- **Description:** Facilitates the management of parking establishments, encompassing operations for adding new establishments, listing all registered establishments, updating establishment details, and removing establishments from the system.\n    \n- **Endpoints:** Supports CRUD functionalities for managing establishment data, including creation, retrieval, modification, and deletion.\n    \n- **Base URL:** [http://localhost:3004/api/establishments](https://null)\n    \n- **Date Created:** June 20, 2024\n    \n\nEndFragment\n\n_©Parkiando 2024_"
+		},
+		{
+			"name": "Reservations",
+			"item": [
+				{
+					"name": "GET reservations",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3004/api/reservations",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3004",
+							"path": [
+								"api",
+								"reservations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST reservations",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"parkingLotId\": 1,\r\n    \"startDate\": \"2024-07-01\",\r\n    \"startTime\": \"10:00 AM\",\r\n    \"duration\": 120,\r\n    \"totalPrice\": 150,\r\n    \"plate\": \"ABC123\",\r\n    \"vehicleType\": \"car\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3004/api/reservations",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3004",
+							"path": [
+								"api",
+								"reservations"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "StartFragment\n\n- **Description:** Manages parking reservations, enabling users to book parking slots, view existing reservations, modify reservation details, and cancel bookings as needed.\n    \n- **Endpoints:** Covers CRUD operations for reservation management, supporting functionalities for creating new reservations, retrieving reservation details, updating booking information, and canceling reservations.\n    \n- **Base URL:** [http://localhost:3004/api/reservations](https://null)\n    \n- **Date Created:** June 20, 2024\n    \n\nEndFragment\n\n_©Parkiando 2024_"
+		},
+		{
+			"name": "Comments",
+			"item": [
+				{
+					"name": "GET comments",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "POST comments",
+					"request": {
+						"method": "POST",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "PUT comments",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "                {\r\n                \"parking\": \"Parking Lot B\",\r\n                \"valoration\": 4,\r\n                \"comment\": \"Ya no\"\r\n                }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3004/api/comments/667ce36b524f4027f6f03176",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3004",
+							"path": [
+								"api",
+								"comments",
+								"667ce36b524f4027f6f03176"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE comments",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3004/api/comments/id/667df0beedbfd256850da022",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3004",
+							"path": [
+								"api",
+								"comments",
+								"id",
+								"667df0beedbfd256850da022"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "StartFragment\n\n- **Description:** Handles user feedback and comments regarding parking experiences, providing functionalities for adding new comments, viewing existing feedback, updating comment content, and deleting comments from the system.\n    \n- **Endpoints:** Implements CRUD operations for comment management, supporting actions to create, retrieve, update, and delete user comments.\n    \n- **Base URL:** [http://localhost:3004/api/comments](https://null)\n    \n- **Date Created:** June 20, 2024\n    \n\nEndFragment\n\n_©Parkiando 2024_"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "id",
+			"value": "1"
+		},
+		{
+			"key": "base_url",
+			"value": "https://postman-rest-api-learner.glitch.me/"
+		}
+	]
+}

@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const establishmentLogic = require('../logic/establishments_logic');
+const nodemailer = require('nodemailer');
 
 // Endpoint GET para buscar un establecimiento por su nombre
 router.get('/search/:name', (req, res) => {
@@ -32,21 +33,28 @@ router.get('/', (req, res) => {
 });
 
 // Endpoint POST para crear un nuevo establecimiento
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
     const body = req.body;
 
-    const { error, value } = establishmentLogic.Schema.validate(body);
+    try {
+        // Validar el cuerpo de la solicitud
+        const { error, value } = establishmentLogic.Schema.validate(body);
 
-    if (!error) {
-        establishmentLogic.createEstablishment(body)
-            .then(establishment => {
-                res.json({ value: establishment });
-            })
-            .catch(err => {
-                res.status(400).json({ error: err.message });
-            });
-    } else {
-        res.status(400).json({ error });
+        if (error) {
+            return res.status(400).json({ error });
+        }
+
+        // Crear el establecimiento y obtener el resultado
+        const establishment = await establishmentLogic.createEstablishment(body);
+
+        // Enviar correo electrónico con los datos del establecimiento creado
+        await establishmentLogic.sendEmailToOwner(establishment);
+
+        // Enviar una respuesta JSON con el establecimiento creado
+        res.status(201).json({ establishment });
+    } catch (error) {
+        console.error('Error creating establishment:', error);
+        res.status(500).json({ error: 'Error creating establishment' });
     }
 });
 

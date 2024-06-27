@@ -3,6 +3,7 @@ const Joi = require('@hapi/joi');
 const bcrypt = require('bcrypt');
 const validator = require('validator')
 
+
 // Validation schema for user object
 const Schema = Joi.object({
     name: Joi.string()
@@ -73,24 +74,33 @@ async function updateUser(email, data) {
         if (!user) {
             throw new Error("User not found");
         }
+
+        // Actualizar solo los campos presentes en los datos recibidos
         if (data.name) {
             user.name = data.name;
         }
         if (data.lastName) {
             user.lastName = data.lastName;
         }
-        if (data.password) {
-            user.password = await bcrypt.hash(data.password, 10); // Encripta la nueva contraseña
-        }
-        if (data.email) {
-            user.email = data.email;
-        }
+
+        // Guardar los cambios en la base de datos
         return await user.save();
     } catch (error) {
         throw new Error("Error updating user: " + error.message);
     }
 }
 
+// Async function to check if a user exists
+async function checkUserExists(identifier) {
+    try {
+        const user = await User.findOne({
+            $or: [{ name: identifier }, { email: identifier }]
+        });
+        return !!user;
+    } catch (error) {
+        throw new Error('Error verificando la existencia del usuario: ' + error.message);
+    }
+}
 // Async function to check if a user exists
 async function checkUserExists(identifier) {
     try {
@@ -124,6 +134,7 @@ async function authenticateUser(email, password) {
             name: user.name,
             lastName: user.lastName,
             email: user.email
+            
             // Agrega aquí otros campos del usuario que necesites devolver
         };
 
@@ -133,6 +144,7 @@ async function authenticateUser(email, password) {
         throw new Error("Error autenticando usuario: " + error.message);
     }
 }
+
 
 // Async function to reset user password
 async function resetUserPassword(identifier, newPassword) {

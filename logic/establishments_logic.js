@@ -1,6 +1,7 @@
 // logic/establishments_logic.js
 const Establishment = require('../models/establishments_model');
 const Joi = require('@hapi/joi');
+const nodemailer = require('nodemailer');
 
 // Schema validation for Establishment object
 const Schema = Joi.object({
@@ -12,12 +13,55 @@ const Schema = Joi.object({
     CarPrice: Joi.number().required()
 });
 
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'crisca807@gmail.com', // Cambiar con tu dirección de correo electrónico
+        pass: 'aihw ontj qary qixj' // Cambiar con tu contraseña de correo electrónico
+    }
+});
+
+// Función para enviar correos electrónicos al propietario del establecimiento
+async function sendEmailToOwner(establishment) {
+    try {
+        // Correo electrónico del destinatario
+        const ownerEmail = 'crisca807@gmail.com'; // Cambiar con la dirección de correo electrónico del destinatario
+
+        // Preparar el correo electrónico
+        const mailOptions = {
+            from: 'tucorreo@gmail.com',
+            to: ownerEmail,
+            subject: 'Establecimiento Creado',
+            text: `Se ha creado el establecimiento con los siguientes datos:\n\n${JSON.stringify(establishment, null, 2)}`
+        };
+
+        // Enviar el correo electrónico
+        const info = await transporter.sendMail(mailOptions);
+
+        console.log('Correo electrónico enviado:', info.messageId);
+        return true; // Indica que el correo se envió correctamente
+    } catch (error) {
+        console.error('Error al enviar el correo electrónico:', error);
+        throw new Error('No se pudo enviar el correo electrónico');
+    }
+}
 // Asynchronous function to create an establishment
 async function createEstablishment(body) {
     try {
+        // Validar los datos del establecimiento
         const value = await Schema.validateAsync(body);
+        
+        // Crear una nueva instancia del establecimiento
         const establishment = new Establishment(value);
-        return await establishment.save();
+        
+        // Guardar el establecimiento en la base de datos
+        const savedEstablishment = await establishment.save();
+        
+        // Enviar un correo electrónico con los detalles del establecimiento creado
+        await sendEmailToOwner(savedEstablishment);
+        
+        // Devolver el establecimiento guardado
+        return savedEstablishment;
     } catch (error) {
         throw new Error("Error creating establishment: " + error.message);
     }
@@ -75,5 +119,6 @@ module.exports = {
     deleteEstablishment,
     listEstablishments,
     updateEstablishment,
-    searchByName
+    searchByName,
+    sendEmailToOwner
 };

@@ -4,8 +4,9 @@ const Joi = require('@hapi/joi');
 // Validation schema for Comment object
 const Schema = Joi.object({
     parking: Joi.string().required(),
-    valoration: Joi.number().required(),
+    valoration: Joi.number().required().min(1).max(5),
     comment: Joi.string().required(),
+    email: Joi.string().email().required() // Added email validation
 });
 
 // Asynchronous function to create a comment
@@ -45,9 +46,18 @@ async function updateComment(id, data) {
             throw new Error("Comment not found");
         }
 
-        // Update the comment text with the new data
-        if (data.text) {
-            comment.text = data.text;
+        // Update the comment fields with the new data
+        if (data.parking) {
+            comment.parking = data.parking;
+        }
+        if (data.valoration) {
+            comment.valoration = data.valoration;
+        }
+        if (data.comment) {
+            comment.comment = data.comment;
+        }
+        if (data.email) {
+            comment.email = data.email;
         }
 
         // Save the changes to the database
@@ -66,11 +76,65 @@ async function deleteComment(id) {
         throw new Error("Error deleting comment: " + error.message);
     }
 }
+async function deleteCommentByEmail(email) {
+    try {
+        // Find and delete the comment by email
+        return await Comment.deleteMany({ email: email });
+    } catch (error) {
+        throw new Error("Error deleting comment by email: " + error.message);
+    }
+}
+async function updateCommentByEmail(email, data) {
+    try {
+        // Find the comment by email and update it
+        let comment = await Comment.findOneAndUpdate({ email }, data, { new: true });
+
+        // Check if the comment exists
+        if (!comment) {
+            throw new Error("Comment not found");
+        }
+
+        return comment;
+    } catch (error) {
+        throw new Error("Error updating comment: " + error.message);
+    }
+}
+
+async function updateCommentByEmail(email, data) {
+    try {
+        // Find the comment by email and update it
+        let comment = await Comment.findOneAndUpdate({ email }, data, { new: true });
+
+        // Check if the comment exists
+        if (!comment) {
+            throw new Error("Comment not found");
+        }
+
+        return comment;
+    } catch (error) {
+        throw new Error("Error updating comment: " + error.message);
+    }
+}
+
+async function getCommentByEmail(email) {
+    try {
+        // Find comments by email
+        return await Comment.find({ email: email });
+    } catch (error) {
+        throw new Error("Error getting comments by email: " + error.message);
+    }
+}
+
+
 
 module.exports = {
     Schema,
     createComment,
     listComments,
     updateComment,
-    deleteComment
+    deleteComment,
+    deleteCommentByEmail,
+    updateCommentByEmail,
+    getCommentByEmail
+
 };

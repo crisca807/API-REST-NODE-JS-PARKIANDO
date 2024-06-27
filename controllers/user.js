@@ -27,7 +27,7 @@ router.post('/send-email', async (req, res) => {
             from: 'crisca807@gmail.com',
             to: email,
             subject: 'Restablecimiento de contraseña',
-            text: 'Hola, has solicitado restablecer tu contraseña. Por favor, sigue las instrucciones para continuar.'
+            text: 'Hola, has solicitado restablecer tu contraseña. Por favor, dirigete al siguiente enlace para  reestablecer la contraseña  http://localhost:3000/resetPassword.'
         };
 
         // Enviar el correo electrónico
@@ -109,15 +109,20 @@ router.post('/', async (req, res) => {
 // PUT endpoint para actualizar los datos de un usuario
 router.put('/:email', async (req, res) => {
     try {
-        const { email } = req.params;
-        const { error } = logic.Schema.validate(req.body);
-        if (error) {
-            return res.status(400).json({ error: error.details[0].message });
+        const email = req.params.email;
+        const data = req.body;
+
+        // Llamar a la función updateUser de la lógica del usuario
+        const updatedUser = await logic.updateUser(email, data);
+
+        if (!updatedUser) {
+            return res.status(404).json({ error: "Usuario no encontrado" });
         }
-        const result = await logic.updateUser(email, req.body);
-        res.json({ user: result });
+
+        res.json({ user: updatedUser });
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        console.error('Error actualizando usuario:', error);
+        res.status(500).json({ error: error.message });
     }
 });
 

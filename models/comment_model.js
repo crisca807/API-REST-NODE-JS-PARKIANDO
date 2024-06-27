@@ -15,6 +15,11 @@ const commentSchema = new mongoose.Schema({
     comment: {
         type: String,
         required: true
+    },
+    email: {
+        type: String,
+        required: true,
+        trim: true // Trim whitespace from ends of email string
     }
 });
 

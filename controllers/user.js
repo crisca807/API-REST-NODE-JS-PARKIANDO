@@ -17,19 +17,21 @@ router.post('/check-account', async (req, res) => {
 router.post('/auth', async (req, res) => {
     try {
         const { email, password } = req.body;
-        const { userType, token, error } = await logic.authenticateUser(email, password);
+        const { userType, name, lastName, email: userEmail, error } = await logic.authenticateUser(email, password);
 
         if (error) {
             return res.status(401).json({ message: 'failed', error });
         }
 
-        // Si la autenticación es exitosa, envía el token y el tipo de usuario
-        res.json({ message: 'success', token, userType });
+        // Si la autenticación es exitosa, envía el tipo de usuario y los datos del usuario
+        res.json({ message: 'success', userType, user: { name, lastName, email: userEmail } });
     } catch (error) {
         console.error('Error al autenticar usuario:', error);
         res.status(500).json({ message: 'failed', error: 'Error al autenticar usuario. Por favor, inténtalo de nuevo más tarde.' });
     }
 });
+
+
 
 // GET endpoint para obtener todos los usuarios activos
 router.get('/', async (req, res) => {

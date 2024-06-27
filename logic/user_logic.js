@@ -107,20 +107,26 @@ async function authenticateUser(email, password) {
         const user = await User.findOne({ email });
         
         if (!user) {
-            return { error: 'Usuario no encontrado', userType: null, token: null };
+            return { error: 'Usuario no encontrado', userType: null };
         }
         
         const isMatch = await bcrypt.compare(password, user.password);
         
         if (!isMatch) {
-            return { error: 'Contraseña incorrecta', userType: null, token: null };
+            return { error: 'Contraseña incorrecta', userType: null };
         }
 
-        // Si hay coincidencia de contraseña, generamos el token JWT
-        const token = jwt.sign({ userId: user._id }, 'tu_secreto', { expiresIn: '1h' });
-        
-        // Devolver el tipo de usuario y el token
-        return { userType: user.userType, token };
+        // Datos del usuario a devolver
+        const userData = {
+            userType: user.userType,
+            name: user.name,
+            lastName: user.lastName,
+            email: user.email
+            // Agrega aquí otros campos del usuario que necesites devolver
+        };
+
+        // Devolver los datos del usuario
+        return { message: 'success', ...userData };
     } catch (error) {
         throw new Error("Error autenticando usuario: " + error.message);
     }

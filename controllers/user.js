@@ -1,7 +1,44 @@
 const express = require('express');
 const router = express.Router();
 const logic = require('../logic/user_logic');
+const nodemailer = require('nodemailer');
 
+router.post('/send-email', async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        // Verificar si el usuario existe
+        const userExists = await logic.checkUserExists(email);
+        if (!userExists) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+
+        // Configurar el transporte del correo electrónico usando nodemailer
+        let transporter = nodemailer.createTransport({
+            service: 'Gmail', // Aquí puedes usar otros servicios como 'SMTP'
+            auth: {
+                user: 'crisca807@gmail.com', // Coloca aquí el correo desde el que enviarás los correos
+                pass: 'aihw ontj qary qixj' // Coloca aquí la contraseña de tu correo
+            }
+        });
+
+        // Configurar el contenido del correo electrónico
+        let mailOptions = {
+            from: 'crisca807@gmail.com',
+            to: email,
+            subject: 'Restablecimiento de contraseña',
+            text: 'Hola, has solicitado restablecer tu contraseña. Por favor, sigue las instrucciones para continuar.'
+        };
+
+        // Enviar el correo electrónico
+        await transporter.sendMail(mailOptions);
+
+        res.status(200).json({ message: 'Correo electrónico enviado correctamente' });
+    } catch (error) {
+        console.error('Error al enviar el correo electrónico:', error);
+        res.status(400).json({ error: 'No se pudo enviar el correo electrónico' });
+    }
+});
 // Endpoint para verificar si un usuario existe
 router.post('/check-account', async (req, res) => {
     try {
@@ -97,23 +134,25 @@ router.delete('/:email', async (req, res) => {
 
 // POST endpoint para restablecer la contraseña
 router.post('/reset-password', async (req, res) => {
-    const { email, newPassword } = req.body;
+    const { identifier, newPassword } = req.body;
+
+    console.log('Recibido en el controlador:', identifier, newPassword);
 
     try {
-        // Verificar si el usuario existe
-        const userExists = await logic.checkUserExists(email);
-        if (!userExists) {
+        // Actualizar la contraseña del usuario
+        const passwordResetSuccess = await logic.resetUserPassword(identifier, newPassword);
+
+        if (passwordResetSuccess) {
+            return res.status(200).json({ message: 'Contraseña restablecida exitosamente' });
+        } else {
             return res.status(404).json({ error: 'Usuario no encontrado' });
         }
-
-        // Actualizar la contraseña del usuario
-        await logic.resetUserPassword(email, newPassword);
-
-        res.status(200).json({ message: 'Contraseña restablecida exitosamente' });
     } catch (error) {
         console.error('Error al restablecer la contraseña:', error);
         res.status(400).json({ error: 'No se pudo restablecer la contraseña' });
     }
 });
+
+
 
 module.exports = router;

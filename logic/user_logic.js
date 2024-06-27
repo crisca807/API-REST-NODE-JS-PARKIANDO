@@ -1,7 +1,7 @@
 const User = require('../models/user_model');
 const Joi = require('@hapi/joi');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const validator = require('validator')
 
 // Validation schema for user object
 const Schema = Joi.object({
@@ -92,12 +92,14 @@ async function updateUser(email, data) {
 }
 
 // Async function to check if a user exists
-async function checkUserExists(email) {
+async function checkUserExists(identifier) {
     try {
-        const user = await User.findOne({ email });
-        return user ? true : false;
+        const user = await User.findOne({
+            $or: [{ name: identifier }, { email: identifier }]
+        });
+        return !!user;
     } catch (error) {
-        throw new Error("Error checking user: " + error.message);
+        throw new Error('Error verificando la existencia del usuario: ' + error.message);
     }
 }
 
@@ -133,12 +135,20 @@ async function authenticateUser(email, password) {
 }
 
 // Async function to reset user password
-async function resetUserPassword(email, newPassword) {
+async function resetUserPassword(identifier, newPassword) {
     try {
+        console.log('Recibido en la lógica:', identifier, newPassword);
+
         // Verificar si el usuario existe
-        const user = await User.findOne({ email });
+        let user;
+        if (validator.isEmail(identifier.trim())) { // Utiliza trim para eliminar espacios en blanco alrededor del correo
+            user = await User.findOne({ email: identifier });
+        } else {
+            user = await User.findOne({ name: identifier });
+        }
+
         if (!user) {
-            throw new Error('Usuario no encontrado');
+            return false; // Indicar que el usuario no fue encontrado
         }
 
         // Encriptar la nueva contraseña
@@ -153,6 +163,7 @@ async function resetUserPassword(email, newPassword) {
         throw new Error('Error restableciendo contraseña del usuario: ' + error.message);
     }
 }
+
 
 module.exports = {
     Schema,

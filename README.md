@@ -8,4 +8,4 @@ en rama "Erik"
 en rama "test"
 
 #### Pruebas de Postman: 
-archivo 
+archivo |API REST PARKIANDO.postman_collection|
